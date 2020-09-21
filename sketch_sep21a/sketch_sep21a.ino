@@ -7,7 +7,6 @@ const char* stuno = "学号";
 const char* stupw = "校园网密码";
 
 /*以 下 勿 动*/
-/*以 下 勿 动*/
 const char* url = "http://172.16.154.130:69/cgi-bin/srun_portal";
 void setup() {
   // put your setup code here, to run once:
@@ -31,8 +30,8 @@ void loop() {
       delay(200);
       Serial.print(".");
     }
-    check_online();
   }
+  check_online();
 }
 
 char* user_encrypt(const char* username) {
