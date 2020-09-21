@@ -7,6 +7,7 @@ const char* stuno = "学号";
 const char* stupw = "校园网密码";
 
 /*以 下 勿 动*/
+/*以 下 勿 动*/
 const char* url = "http://172.16.154.130:69/cgi-bin/srun_portal";
 void setup() {
   // put your setup code here, to run once:
@@ -23,7 +24,15 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  check_online();
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.printf("\nReConnecting to %s", ssid);
+    WiFi.begin(ssid, sspw);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(200);
+      Serial.print(".");
+    }
+    check_online();
+  }
 }
 
 char* user_encrypt(const char* username) {
@@ -84,9 +93,9 @@ void check_online() {
   } else {
     const char* error = doc["error"];
     Serial.println(error);
-    delay(30000);
   }
   http.end();
   client.stop();
   doc.clear();
+  delay(30000);
 }
