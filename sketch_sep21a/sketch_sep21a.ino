@@ -1,6 +1,6 @@
 #include<ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <ArduinoJson.h>
+
 const char* ssid = "你的路由器名称";
 const char* sspw = "路由器WiFi密码";
 const char* stuno = "学号";
@@ -65,7 +65,6 @@ char* pw_encrypt(const char* password) {
   return pw;
 }
 void check_online() {
-  StaticJsonDocument<1024> doc;
   HTTPClient http;
   WiFiClient client;
   http.begin(client, url);
@@ -85,14 +84,6 @@ void check_online() {
   int httpCode = http.POST(payload);
   Serial.printf("Send POST request to: %s\n", url);
   Serial.printf("Server response: %s\n", http.getString().c_str());
-  DeserializationError error = deserializeJson(doc, http.getString());
-  if (error) {
-    Serial.printf("deserializeJson() failed: ");
-    Serial.println(error.c_str());
-  } else {
-    const char* error = doc["error"];
-    Serial.println(error);
-  }
   http.end();
   client.stop();
   doc.clear();
