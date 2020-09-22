@@ -10,6 +10,8 @@ const char* stupw = "校园网密码";
 const char* url = "http://172.16.154.130:69/cgi-bin/srun_portal";
 void setup() {
   // put your setup code here, to run once:
+  pinMode(BUILTIN_LED, OUTPUT);
+  digitalWrite(BUILTIN_LED, HIGH);
   Serial.begin(115200);
   Serial.printf("\nConnecting to %s", ssid);
   WiFi.begin(ssid, sspw);
@@ -31,7 +33,10 @@ void loop() {
       Serial.print(".");
     }
   }
+  breath_on();
   check_online();
+  breath_off();
+  delay(10000);
 }
 
 char* user_encrypt(const char* username) {
@@ -66,8 +71,7 @@ char* pw_encrypt(const char* password) {
 }
 void check_online() {
   HTTPClient http;
-  WiFiClient client;
-  http.begin(client, url);
+  http.begin(url);
   http.addHeader("Accept", "application/json");
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   char payload[200];
@@ -85,7 +89,17 @@ void check_online() {
   Serial.printf("Send POST request to: %s\n", url);
   Serial.printf("Server response: %s\n", http.getString().c_str());
   http.end();
-  client.stop();
-  doc.clear();
-  delay(30000);
+}
+
+void breath_off() {
+  for (int i = 1; i < 1024; i++) {
+    analogWrite(BUILTIN_LED, i);
+    delay(2);
+  }
+}
+void breath_on() {
+  for (int i = 1022; i >= 0; i--) {
+    analogWrite(BUILTIN_LED, i);
+    delay(2);
+  }
 }
