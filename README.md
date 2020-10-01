@@ -1,6 +1,9 @@
 # ESP8266-Srun3kAutoLogin
 基于ESP8266 NodeMCU 1.0的深澜校园网自动登录。
 
+## 已知问题
+部分数字加密后由于未经urlencode可能导致报密码错误，建议修改密码，有能力者可自行编写urlencode方法后pull request
+
 # 使用方法
 1. 安装[Arduino](https://www.arduino.cc/en/Main/Software)
 
