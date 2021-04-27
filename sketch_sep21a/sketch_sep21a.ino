@@ -8,6 +8,55 @@ const char* stupw = "校园网密码";
 
 /*以 下 勿 动*/
 const char* url = "http://172.16.154.130:69/cgi-bin/srun_portal";
+char dec2hex(short int c)
+{
+    if (0 <= c && c <= 9)
+    {
+        return c + '0';
+    }
+    else if (10 <= c && c <= 15)
+    {
+        return c + 'A' - 10;
+    }
+    else
+    {
+        return -1;
+    }
+}
+ 
+//编码一个url 
+void urlencode(char url[])
+{
+    int i = 0;
+    int len = strlen(url);
+    int res_len = 0;
+    char res[50];
+    for (i = 0; i < len; ++i)
+    {
+        char c = url[i];
+        if (    ('0' <= c && c <= '9') ||
+                ('a' <= c && c <= 'z') ||
+                ('A' <= c && c <= 'Z') ||
+                c == '/' || c == '.')
+        {
+            res[res_len++] = c;
+        }
+        else
+        {
+            int j = (short int)c;
+            if (j < 0)
+                j += 256;
+            int i1, i0;
+            i1 = j / 16;
+            i0 = j - i1 * 16;
+            res[res_len++] = '%';
+            res[res_len++] = dec2hex(i1);
+            res[res_len++] = dec2hex(i0);
+        }
+    }
+    res[res_len] = '\0';
+    strcpy(url, res);
+}
 void setup() {
   // put your setup code here, to run once:
   pinMode(BUILTIN_LED, OUTPUT);
@@ -44,17 +93,18 @@ char* user_encrypt(const char* username) {
   strcpy(usrtemp, username);
   for (int i = 0; i < strlen(usrtemp); i++)
     usrtemp[i] += 4;
-  char* usr = (char*)malloc(sizeof(char) * (strlen(usrtemp) + 1 + 9));
-  memset(usr, '\0', sizeof(char) * (strlen(usrtemp) + 1 + 9));
+  char* usr = (char*)malloc(sizeof(char) * ((strlen(usrtemp) + 9)*3+1));//9 for {SRUN3}\r\n *3 for urlencode,1 for '\0'
+  memset(usr, '\0', sizeof(char) * ((strlen(usrtemp) + 9)*3+1));
   strcpy(usr, "{SRUN3}\r\n");
   strcat(usr, usrtemp);
   //Serial.printf("Username encrypted: %s\n", usr);
+  urlencode(usr);
   return usr;
 }
 char* pw_encrypt(const char* password) {
   char key[] = {"1234567890"};
-  char* pw = (char*)malloc(sizeof(char) * (2 * strlen(password) + 1));
-  memset(pw, '\0', sizeof(char) * (2 * strlen(password) + 1));
+  char* pw = (char*)malloc(sizeof(char) * (6 * strlen(password) + 1));//*2 for encrypt,*3 for urlencode,1 for '\0'
+  memset(pw, '\0', sizeof(char) * (6 * strlen(password) + 1));
   for (int i = 0; i < strlen(password); i++) {
     char ki = password[i] ^ key[10 - i % 10 - 1];
     char _l = (ki & 0x0f) + 0x36;
@@ -67,6 +117,7 @@ char* pw_encrypt(const char* password) {
     }
   }
   //Serial.printf("password encrypted:%s\n", pw);
+  urlencode(pw);
   return pw;
 }
 void check_online() {
